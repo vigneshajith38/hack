@@ -11,10 +11,8 @@ MAX_FILE_SIZE_BYTES = int(
 )
 
 # AI Model settings
-DETECTOR_PROVIDER = os.getenv("DETECTOR_PROVIDER", "huggingface_space")
-HF_SPACE_ID = os.getenv("HF_SPACE_ID", "Sara1708/deepfake-audio-detector")
-HF_TOKEN = os.getenv("HF_TOKEN")
-
+# AI Model settings
+MODEL_NAME = "MelodyMachine/Deepfake-audio-detection"
 # API settings
 ALLOWED_ORIGINS = [
     origin.strip()
