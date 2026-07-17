@@ -11,7 +11,9 @@ from .detector import ModelNotReadyError, ModelServiceError, VoiceCloneDetector
 from .schemas import DetectionLabel, DetectionResponse, HealthResponse
 
 
-origins = [origin.strip() for origin in os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")]
+from .config import ALLOWED_ORIGINS
+
+origins = ALLOWED_ORIGINS
 detector = VoiceCloneDetector()
 
 app = FastAPI(title="Voice Clone Detector", version="0.1.0")

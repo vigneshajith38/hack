@@ -7,10 +7,12 @@ class AudioValidationError(ValueError):
     """Raised when an uploaded file is not suitable for inference."""
 
 
-SUPPORTED_SUFFIXES = {".wav"}
-MIN_DURATION_SECONDS = 2.0
-MAX_DURATION_SECONDS = 60.0
-MAX_FILE_SIZE_BYTES = 15 * 1024 * 1024
+from .config import (
+    SUPPORTED_SUFFIXES,
+    MIN_DURATION_SECONDS,
+    MAX_DURATION_SECONDS,
+    MAX_FILE_SIZE_BYTES,
+)
 
 
 def validate_wav(path: Path) -> float:
