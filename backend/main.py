@@ -13,6 +13,7 @@ Author:
 
 from pathlib import Path
 import shutil
+import httpx
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, HTTPException, UploadFile
@@ -28,6 +29,7 @@ load_dotenv()
 # -------------------------------------------------------------------
 
 APP_NAME = "VoiceShield SDK"
+AI_SERVER = "http://127.0.0.1:8000"
 
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
@@ -65,38 +67,34 @@ async def health():
 
 @app.post("/analyze")
 async def analyze_audio(file: UploadFile = File(...)):
-    """
-    Upload an audio file and return a dummy analysis.
-
-    Supported formats:
-    - .wav
-    - .mp3
-    """
 
     extension = Path(file.filename).suffix.lower()
 
-    if extension not in ALLOWED_EXTENSIONS:
+    if extension != ".wav":
         raise HTTPException(
             status_code=400,
-            detail="Only .wav and .mp3 files are supported."
+            detail="Only .wav files are supported."
         )
 
-    destination = UPLOAD_DIR / file.filename
+    audio_bytes = await file.read()
 
-    # Save uploaded file
-    with destination.open("wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    async with httpx.AsyncClient(timeout=120) as client:
 
-    response = {
-        "risk_score": 87,
-        "risk_level": "High",
-        "transcript": "This is a placeholder transcript.",
-        "voice_clone_probability": 0.32,
-        "scam_indicators": [
-            "Urgency",
-            "Money request"
-        ],
-        "recommendation": "Verify the caller before sending money."
-    }
+        response = await client.post(
+            "http://127.0.0.1:8000/detect",
+            files={
+                "audio": (
+                    file.filename,
+                    audio_bytes,
+                    file.content_type
+                )
+            }
+        )
 
-    return JSONResponse(content=response)
+    if response.status_code != 200:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    return response.json()
