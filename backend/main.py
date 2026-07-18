@@ -3,7 +3,7 @@ VoiceShield SDK Backend
 
 A production-ready FastAPI starter backend that accepts audio uploads
 and returns a dummy AI analysis response.
-
+py -m uvicorn app.main:app --reload --port 8000
 Python Version:
     3.11+
 
