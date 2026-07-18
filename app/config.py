@@ -1,7 +1,14 @@
 import os
 
 # Audio settings
-SUPPORTED_SUFFIXES = {".wav"}
+SUPPORTED_SUFFIXES = {
+    ".wav",
+    ".mp3",
+    ".aac",
+    ".m4a",
+    ".mpeg",
+    ".ogg",
+}
 
 MIN_DURATION_SECONDS = float(os.getenv("MIN_DURATION_SECONDS", "2"))
 MAX_DURATION_SECONDS = float(os.getenv("MAX_DURATION_SECONDS", "60"))

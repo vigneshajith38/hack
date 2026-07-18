@@ -1,11 +1,8 @@
 from pathlib import Path
-
-import soundfile as sf
-
+import librosa
 
 class AudioValidationError(ValueError):
     """Raised when an uploaded file is not suitable for inference."""
-
 
 from .config import (
     SUPPORTED_SUFFIXES,
@@ -15,18 +12,30 @@ from .config import (
 )
 
 
-def validate_wav(path: Path) -> float:
+
+def validate_audio(path: Path) -> float:
     if path.suffix.lower() not in SUPPORTED_SUFFIXES:
-        raise AudioValidationError("Only WAV audio is supported in this first version.")
+        raise AudioValidationError(
+            "Supported formats: .wav, .mp3, .aac, .mpeg"
+        )
 
     try:
-        info = sf.info(path)
-    except RuntimeError as error:
-        raise AudioValidationError("The upload is not a readable WAV audio file.") from error
+        audio, sr = librosa.load(path, sr=16000, mono=True)
+    except Exception as error:
+        raise AudioValidationError(
+            "The uploaded audio file could not be read."
+        ) from error
 
-    duration = info.duration
+    duration = len(audio) / sr
+
     if duration < MIN_DURATION_SECONDS:
-        raise AudioValidationError(f"Audio must be at least {MIN_DURATION_SECONDS:g} seconds long.")
+        raise AudioValidationError(
+            f"Audio must be at least {MIN_DURATION_SECONDS:g} seconds long."
+        )
+
     if duration > MAX_DURATION_SECONDS:
-        raise AudioValidationError(f"Audio must be at most {MAX_DURATION_SECONDS:g} seconds long.")
+        raise AudioValidationError(
+            f"Audio must be at most {MAX_DURATION_SECONDS:g} seconds long."
+        )
+
     return round(float(duration), 3)

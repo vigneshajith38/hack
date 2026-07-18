@@ -12,12 +12,10 @@ Author:
 """
 
 from pathlib import Path
-import shutil
 import httpx
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, HTTPException, UploadFile
-from fastapi.responses import JSONResponse
 
 # -------------------------------------------------------------------
 # Load environment variables
@@ -31,10 +29,14 @@ load_dotenv()
 APP_NAME = "VoiceShield SDK"
 AI_SERVER = "http://127.0.0.1:8000"
 
-UPLOAD_DIR = Path("uploads")
-UPLOAD_DIR.mkdir(exist_ok=True)
-
-ALLOWED_EXTENSIONS = {".wav", ".mp3"}
+ALLOWED_EXTENSIONS = {
+    ".wav",
+    ".mp3",
+    ".aac",
+    ".mpeg",
+    ".m4a",
+    ".ogg",
+}
 
 app = FastAPI(
     title=APP_NAME,
@@ -42,24 +44,16 @@ app = FastAPI(
     description="Backend API for VoiceShield SDK",
 )
 
-
 # -------------------------------------------------------------------
 # Health Check Endpoint
 # -------------------------------------------------------------------
 
 @app.get("/health")
 async def health():
-    """
-    Health check endpoint.
-
-    Returns:
-        JSON object indicating service status.
-    """
     return {
         "status": "healthy",
         "service": APP_NAME
     }
-
 
 # -------------------------------------------------------------------
 # Audio Analysis Endpoint
@@ -70,10 +64,10 @@ async def analyze_audio(file: UploadFile = File(...)):
 
     extension = Path(file.filename).suffix.lower()
 
-    if extension != ".wav":
+    if extension not in ALLOWED_EXTENSIONS:
         raise HTTPException(
             status_code=400,
-            detail="Only .wav files are supported."
+            detail="Supported formats: .wav, .mp3, .aac, .mpeg, .m4a"
         )
 
     audio_bytes = await file.read()
@@ -81,20 +75,20 @@ async def analyze_audio(file: UploadFile = File(...)):
     async with httpx.AsyncClient(timeout=120) as client:
 
         response = await client.post(
-            "http://127.0.0.1:8000/detect",
+            f"{AI_SERVER}/detect",
             files={
                 "audio": (
                     file.filename,
                     audio_bytes,
-                    file.content_type
+                    file.content_type,
                 )
-            }
+            },
         )
 
     if response.status_code != 200:
         raise HTTPException(
             status_code=response.status_code,
-            detail=response.text
+            detail=response.json()
         )
 
     return response.json()
