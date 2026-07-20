@@ -16,7 +16,7 @@ from .config import (
 def validate_audio(path: Path) -> float:
     if path.suffix.lower() not in SUPPORTED_SUFFIXES:
         raise AudioValidationError(
-            "Supported formats: .wav, .mp3, .aac, .mpeg"
+            "Supported formats: .wav, .mp3, .aac, .mpeg,.ogg"
         )
 
     try:
