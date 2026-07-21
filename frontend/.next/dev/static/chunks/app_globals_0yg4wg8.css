@@ -406,6 +406,10 @@
     height: 1px;
   }
 
+  .h-screen {
+    height: 100vh;
+  }
+
   .min-h-screen {
     min-height: 100vh;
   }
@@ -718,6 +722,10 @@
     letter-spacing: var(--tracking-tight);
   }
 
+  .break-all {
+    word-break: break-all;
+  }
+
   .text-black {
     color: var(--color-black);
   }
@@ -823,6 +831,10 @@
   @media (min-width: 48rem) {
     .md\:grid-cols-3 {
       grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .md\:grid-cols-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
 
