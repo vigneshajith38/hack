@@ -1,33 +1,16 @@
 """
-VoiceShield SDK Backend
-
-A production-ready FastAPI starter backend that accepts audio uploads
-and returns a dummy AI analysis response.
-py -m uvicorn app.main:app --reload --port 8000
-Python Version:
-    3.11+
-
-Author:
-    VoiceShield SDK
-"""
-
 from pathlib import Path
-import httpx
+import tempfile
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, HTTPException, UploadFile
+from gradio_client import Client, handle_file
 
-# -------------------------------------------------------------------
-# Load environment variables
-# -------------------------------------------------------------------
 load_dotenv()
 
-# -------------------------------------------------------------------
-# Application Configuration
-# -------------------------------------------------------------------
-
 APP_NAME = "VoiceShield SDK"
-AI_SERVER ="https://hariniiiiiiiiiii-voiceshield-ai.hf.space"
+
+client = Client("Hariniiiiiiiiiii/Voiceshield_AI")
 
 ALLOWED_EXTENSIONS = {
     ".wav",
@@ -44,9 +27,6 @@ app = FastAPI(
     description="Backend API for VoiceShield SDK",
 )
 
-# -------------------------------------------------------------------
-# Health Check Endpoint
-# -------------------------------------------------------------------
 
 @app.get("/health")
 async def health():
@@ -55,9 +35,6 @@ async def health():
         "service": APP_NAME
     }
 
-# -------------------------------------------------------------------
-# Audio Analysis Endpoint
-# -------------------------------------------------------------------
 
 @app.post("/analyze")
 async def analyze_audio(file: UploadFile = File(...)):
@@ -67,28 +44,22 @@ async def analyze_audio(file: UploadFile = File(...)):
     if extension not in ALLOWED_EXTENSIONS:
         raise HTTPException(
             status_code=400,
-            detail="Supported formats: .wav, .mp3, .aac, .mpeg, .m4a"
+            detail="Supported formats: .wav, .mp3, .aac, .mpeg, .m4a, .ogg"
         )
 
-    audio_bytes = await file.read()
+    with tempfile.NamedTemporaryFile(delete=False, suffix=extension) as temp:
+        temp.write(await file.read())
+        temp_path = temp.name
 
-    async with httpx.AsyncClient(timeout=120) as client:
-
-        response = await client.post(
-            f"{AI_SERVER}/detect",
-            files={
-                "audio": (
-                    file.filename,
-                    audio_bytes,
-                    file.content_type,
-                )
-            },
+    try:
+        result = client.predict(
+            audio_path=handle_file(temp_path),
+            api_name="/detect",
         )
+        return result
 
-    if response.status_code != 200:
-        raise HTTPException(
-            status_code=response.status_code,
-            detail=response.json()
-        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    return response.json()
+    finally:
+        Path(temp_path).unlink(missing_ok=True)
