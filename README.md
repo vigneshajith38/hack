@@ -4,10 +4,18 @@ AI-powered voice cloning detection and scam prevention for developers.
 
 VoiceShield SDK provides a simple API that developers can integrate into voice applications to detect suspicious voice cloning and flag potential deepfake or scam activity in real time.
 
-##features 
-i) deepfake audio detection - Analyzes uploaded audio to determine whether it's real or synthetic.
-ii) Simple REST API - Easy integration into any voice application.
-iii) Scam prevention - Helps flag suspicious voice activity before it causes harm.
+## Features 
+i) **deepfake audio detection** 
+
+Analyzes uploaded audio to determine whether it's real or synthetic.
+
+ii) **Simple REST API** 
+
+Easy integration into any voice application.
+
+iii) **Scam prevention**
+
+Helps flag suspicious voice activity before it causes harm.
 
 ## Development tools and AI usage 
 Codex
@@ -31,13 +39,17 @@ GPT-5.6
 ## Tech Stack
 
 Backend - 	FastAPI, Python
-AI Model - Hugging Face Deepfake Audio Detection Model
-Deployment - Render
-Frontend - HTML / CSS / JavaScript
-Version - Control	GitHub
-Editor - VS Code
 
-## Project structure 
+AI Model - Hugging Face Deepfake Audio Detection Model
+
+Deployment - Render
+
+Frontend - HTML / CSS / JavaScript
+
+Version - Control	GitHub
+
+Editor - VS Code
+ 
 
 ## Project Structure
 
@@ -82,9 +94,12 @@ VoiceShield-SDK/
    - Confidence level
   
 Example API Response
+
 {
   "label": "synthetic",
+  
   "synthetic_probability": 0.9999,
+  
   "confidence": "high"
 }
 
