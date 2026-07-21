@@ -27,7 +27,7 @@ load_dotenv()
 # -------------------------------------------------------------------
 
 APP_NAME = "VoiceShield SDK"
-AI_SERVER = "http://127.0.0.1:8000"
+AI_SERVER ="https://hariniiiiiiiiiii-voiceshield-ai.hf.space"
 
 ALLOWED_EXTENSIONS = {
     ".wav",
