@@ -88,19 +88,41 @@ export default function WorkspacePage() {
               </div>
 
               <button
-                onClick={() => {
-                  if (!selectedFile) {
-                    alert("Please select an audio file first.");
-                    return;
-                  }
+                onClick={async () => {
+  if (!selectedFile) {
+    alert("Please select an audio file first.");
+    return;
+  }
 
-                  setLoading(true);
+  setLoading(true);
 
-                  // Temporary until backend integration
-                  setTimeout(() => {
-                    router.push("/results");
-                  }, 1000);
-                }}
+  try {
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    const response = await fetch(
+      "https://voiceshield-backend-nebm.onrender.com/analyze",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const result = await response.json();
+
+    console.log(result);
+
+    // Store result for the results page
+    localStorage.setItem("analysisResult", JSON.stringify(result));
+
+    router.push("/results");
+  } catch (err) {
+    console.error(err);
+    alert("Analysis failed.");
+  } finally {
+    setLoading(false);
+  }
+}}
                 disabled={loading}
                 className="mt-8 w-full rounded-xl bg-black py-3 text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
               >
